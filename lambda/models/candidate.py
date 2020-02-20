@@ -1,4 +1,4 @@
-from party_affiliation import PartyAffiliation
+from .party_affiliation import PartyAffiliation
 
 
 class Candidate:

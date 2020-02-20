@@ -1,13 +1,19 @@
 # Modified from https://gist.github.com/yanofsky/5436496
 import csv
+from pprint import pprint
 
 from models.candidate import Candidate
 from models.party_affiliation import PartyAffiliation
 from secrets import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_KEY, ACCESS_SECRET
-from .models.candidate_tweet import CandidateTweet
+from models.candidate_tweet import CandidateTweet
 
 import tweepy
 
+import nltk
+nltk.download('vader_lexicon')
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+
+sia = SentimentIntensityAnalyzer()
 candidates = [Candidate("Andrew Yang", "AndrewYang", PartyAffiliation.democrat)]
 
 
@@ -24,7 +30,8 @@ def authorize_tweepy():
 
 
 def analyze_sentiment(text):
-    pass
+    import ipdb; ipdb.set_trace()
+    return sia.polarity_scores(text)
 
 
 def get_all_tweets(tweepy, candidate):
@@ -48,7 +55,7 @@ def get_all_tweets(tweepy, candidate):
 
     # keep grabbing tweets until there are no tweets left to grab
     while len(new_tweets) > 0:
-        print("getting tweets before %s" % oldest)
+        pprint("getting tweets before %s" % oldest)
 
         # all subsequent requests use the max_id param to prevent duplicates
         new_tweets = tweepy.user_timeline(screen_name=candidate.twitter_handle, count=200, max_id=oldest)
@@ -59,15 +66,15 @@ def get_all_tweets(tweepy, candidate):
         # update the id of the oldest tweet less one
         oldest = all_tweets[-1].id - 1
 
-        print("...%s tweets downloaded so far" % (len(all_tweets)))
+        pprint("...%s tweets downloaded so far" % (len(all_tweets)))
 
     # transform the tweepy tweets into a 2D array that will populate the csv
-    
+
     out_tweets = [CandidateTweet(candidate, tweet.text.encode("utf-8"), tweet.id_str,
                                  analyze_sentiment(tweet.text)) for tweet in all_tweets]
-    
+
     return out_tweets
-    
+
     # write the csv
     # with open('%s_tweets.csv' % candidate.twitter_handle, 'r') as f:
     #     writer = csv.writer(f)
@@ -78,6 +85,6 @@ def get_all_tweets(tweepy, candidate):
 
 if __name__ == '__main__':
     api = authorize_tweepy()
-    
+
     for curr_candidate in candidates:
         get_all_tweets(api, curr_candidate)
