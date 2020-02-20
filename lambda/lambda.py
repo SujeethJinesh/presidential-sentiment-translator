@@ -10,7 +10,8 @@ from models.candidate_tweet import CandidateTweet
 import tweepy
 
 import nltk
-nltk.download('vader_lexicon')
+
+nltk.download('vader_lexicon')  # TODO: download a larger corpus
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 
 sia = SentimentIntensityAnalyzer()
@@ -18,10 +19,10 @@ candidates = [Candidate("Andrew Yang", "AndrewYang", PartyAffiliation.democrat)]
 
 
 def authorize_tweepy():
-    '''
+    """
     authorize twitter, initialize tweepy
     :return: authorized api
-    '''
+    """
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_KEY, ACCESS_SECRET)
     api = tweepy.API(auth)
@@ -30,17 +31,18 @@ def authorize_tweepy():
 
 
 def analyze_sentiment(text):
-    import ipdb; ipdb.set_trace()
+    import ipdb;
+    ipdb.set_trace()
     return sia.polarity_scores(text)
 
 
 def get_all_tweets(tweepy, candidate):
-    '''
+    """
     Twitter only allows access to a users most recent 3240 tweets with this method
     :param tweepy: api we'll be using to get tweets
-    :param screen_name: candidate's twitter_handle we'll be using to scrape
+    :param candidate: candidate we'll be using to scrape
     :return: list of tweets for the candidate
-    '''
+    """
     # initialize a list to hold all the tweepy Tweets
     all_tweets = []
 
@@ -86,5 +88,6 @@ def get_all_tweets(tweepy, candidate):
 if __name__ == '__main__':
     api = authorize_tweepy()
 
+    candidate_tweets = dict()
     for curr_candidate in candidates:
-        get_all_tweets(api, curr_candidate)
+        candidate_tweets[curr_candidate] = get_all_tweets(api, curr_candidate)
