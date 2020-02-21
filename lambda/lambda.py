@@ -1,5 +1,4 @@
 # Modified from https://gist.github.com/yanofsky/5436496
-import csv
 from pprint import pprint
 
 from models.candidate import Candidate
